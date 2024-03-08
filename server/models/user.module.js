@@ -24,5 +24,13 @@ userSchema.pre("save", async function (next) {
   }
   this.password = await bcrypt.hash(this.password, 10);
 });
+userSchema.methods.isPasswordValidated=(userpassword){
+  return bcrypt.compare(userpassword, this.password)
+}
+userSchema.methods.getJwtToken=function () {
+  return jwt.sign({
+    id: this._id
+  },process.env.JWT_SECRET)
+}
 const User = mongoose.model("User", userSchema);
 export default User;
