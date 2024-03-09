@@ -1,5 +1,5 @@
 import User from "../models/user.module.js";
-import { Jwt } from "jsonwebtoken";
+import Jwt from "jsonwebtoken";
 import { createTokenCookie } from "../utils/createTokenCookie.js";
 export const registerUser = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -45,7 +45,6 @@ export const registerUser = async (req, res, next) => {
   }
 };
 export const loginUser = async (req, res, next) => {
-  // data from frontend via body
   const { email, password } = req.body;
   try {
     let user = await User.findOne({ email });
@@ -54,15 +53,15 @@ export const loginUser = async (req, res, next) => {
         success: false,
         message: "Invalid email or password!",
       });
-      const ispasswordCorrect = await user.isPasswordValidated("password");
-      if (!ispasswordCorrect) {
-        res.status(404).json({
-          success: false,
-          message: "Invalid email or password",
-        });
-      }
-      createTokenCookie(res, user, 200, "Logged in successfully!");
     }
+    const isPasswordCorrect = await user.isPasswordValidated(password);
+    if (!isPasswordCorrect) {
+      res.status(404).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+    createTokenCookie(res, user, 200, "Logged in successfully!");
   } catch (error) {
     console.log(error);
   }
